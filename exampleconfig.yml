@@ -23,6 +23,11 @@ Rooms:
         Type: GPIO
         Pin: 24
         Duration: 2
+      - Name: Switch
+        Type: GPIO
+        ReadOnly: True
+        PullUpDown: up
+        Pin: 26
   - Name: Scripts
     Appliances:
       - Name: Internet
