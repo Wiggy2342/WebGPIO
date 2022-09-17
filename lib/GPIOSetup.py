@@ -20,7 +20,21 @@ def initialState(active_value):
 for room in rooms:
 	for Appliance in room['Appliances']:
 		if Appliance['Type'] == 'GPIO':
-			initial_state = initialState(Appliance['ActiveState'])
-			GPIO.setup(Appliance['Pin'],
-					   GPIO.OUT, 
-					   initial= initial_state)
+			if 'ReadOnly' in Appliance:
+				roFlag = Appliance['ReadOnly']
+			else:
+				roFlag = False
+			if roFlag:
+				if 'PullUpDown' in Appliance:
+					if Appliance['PullUpDown'].lower() in ['up', 'pullup']:
+						GPIO.setup(Appliance['Pin'], GPIO.IN, GPIO.PUD_UP)
+					elif Appliance['PullUpDown'].lower() in ['down', 'pulldown']:
+						GPIO.setup(Appliance['Pin'], GPIO.IN, GPIO.PUD_DOWN)
+					else:
+						GPIO.setup(Appliance['Pin'], GPIO.IN)
+						print(F"For pin {Appliance['Pin']}, an invalid setting for PullUpDown was found {Appliance['PullUpDown']}.\nDisabling pullup/down by default.\nValid options for this setting are: up, down, None")
+				else:
+						GPIO.setup(Appliance['Pin'], GPIO.IN)
+			else:
+				initial_state = initialState(Appliance['ActiveState'])
+				GPIO.setup(Appliance['Pin'], GPIO.OUT, initial=initial_state)
