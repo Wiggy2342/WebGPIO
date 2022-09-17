@@ -8,6 +8,10 @@ class Appliance:
 		self.attributes = attributes
 		self.name = attributes['Name']
 		self.type = attributes['Type']
+		if 'ReadOnly' in attributes:
+			self.read_only = attributes['ReadOnly']
+		else:
+			self.read_only = False
 		if self.type == 'GPIO':
 			self.pin = attributes['Pin']
 			self.active = attributes['ActiveState']
@@ -52,7 +56,7 @@ class Appliance:
 				return 0
 
 	def executeAction(self):
-		if self.type == 'GPIO':
+		if self.type == 'GPIO' and not self.read_only:
 			original_state= GPIO.input(self.pin)
 			new_state = 1 - original_state
 			GPIO.output(self.pin, new_state)

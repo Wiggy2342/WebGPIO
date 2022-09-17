@@ -13,6 +13,7 @@ def updateStates(rooms):
 		for j, appliance in enumerate(room['Appliances']):
 			current_appliance = Appliance(appliance)
 			rooms[i]['Appliances'][j]['State'] = current_appliance.getState()
+			rooms[i]['Appliances'][j]['ReadOnly'] = current_appliance.read_only
 	return rooms
 
 @app.context_processor
@@ -54,7 +55,8 @@ def button(room_index, appliance_index):
 		'state' : appliance.getState(),
 		'room_index' : room_index,
 		'appliance_index' : appliance_index,
-		'name' : appliance.name
+		'name' : appliance.name,
+		'read_only' : appliance.read_only
 	}
 	return render_template('button.html', **templateData)
 
