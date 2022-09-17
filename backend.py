@@ -1,5 +1,5 @@
 import datetime, json
-from flask import Flask, render_template, request, redirect, Markup, make_response, url_for
+from flask import Flask, render_template, request, redirect, Markup, make_response, url_for, jsonify
 from lib.cors import crossdomain
 from lib.setup import rooms, settings
 from lib.GPIOSetup import GPIO
@@ -83,15 +83,26 @@ def logout():
 	response.set_cookie('token', '', expires=0, httponly=True, samesite='Lax')
 	return response
 
+@app.route("/states", methods = ['GET'])
+def get_states():
+	response = dict()
+	for room in rooms:
+		for app in room['Appliances']:
+			if 'ReadOnly' in app:
+				if app['ReadOnly']:
+					appliance = Appliance(app)
+					response[app['Name']] = appliance.getState()
+	return jsonify(response)
+
 if __name__ == "__main__":
 	if settings['SSL']['Enabled']:
-		app.run(host = settings['Host'], 
+		app.run(host = settings['Host'],
 				port = settings['Port'],
-				threaded = settings['Threaded'], 
-				debug = settings['Debug'], 
+				threaded = settings['Threaded'],
+				debug = settings['Debug'],
 				ssl_context = (settings['cerPath'], settings['keyPath']))
 	else:
-		app.run(host = settings['Host'], 
-				port = settings['Port'], 
-				threaded = settings['Threaded'], 
+		app.run(host = settings['Host'],
+				port = settings['Port'],
+				threaded = settings['Threaded'],
 				debug = settings['Debug'])
